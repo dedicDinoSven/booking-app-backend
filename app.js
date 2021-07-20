@@ -1,27 +1,22 @@
 // Environment variables
 require('dotenv').config();
 
+const createError = require('http-errors');
 const express = require('express');
-const mongoose = require('mongoose');
+const cookieParser = require('cookie-parser')
+const logger = require('morgan');
 const passport = require('passport');
 
-// Connect to MongoDB
-const db = process.env.MONGO_URI;
-mongoose
-  .connect(db, {
-    useUnifiedTopology: true,
-    useNewUrlParser: true,
-  })
-  .then(() => console.log('MongoDB Connected'))
-  .catch((err) => console.log(err));
-mongoose.set("useCreateIndex", true);
+const db = require('./config/mongodb');
 
-require('./config/auth');
+require('./middleware/auth');
 
 const app = express();
 
+app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
 
 // Routes
 app.use('/', require('./routes/index'));
@@ -33,7 +28,12 @@ app.use(
   require('./routes/secureRoutes')
 );
 
-// Handle errors.
+// catch 404 and forward to error handler
+app.use(function(req, res, next) {
+  next(createError(404));
+});
+
+// error handler
 app.use(function (err, req, res, next) {
   res.status(err.status || 500);
   res.json({ error: err });

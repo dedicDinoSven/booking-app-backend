@@ -9,13 +9,19 @@ const User = require('../models/user');
 passport.use(
   'register',
   new localStrategy(
-    { usernameField: 'email', passwordField: 'password' },
-    async (email, password, done) => {
-      let fullName = 'Dino-Sven';
+    { usernameField: 'email', passwordField: 'password', passReqToCallback: true },
+    async (req, email, password, done) => {
       try {
+        let fullName = req.body.fullName;
+        
+        const user = await User.findOne({ email });
+        if (user) {
+          return done(null, false, { message: 'Email already in use.' }); // if user doesn't match any users in db return error
+        }
+
         const newUser = await User.create({ fullName, email, password }); // save data provided by the user to the db
 
-        return done(null, newUser); // send user info to the next middleware if successful
+        return done(null, newUser, { message: 'Registered successfully.' }); // send user info to the next middleware if successful
       } catch (err) {
         done(err); // otherwise report error
       }
@@ -32,15 +38,17 @@ passport.use(
       try {
         const user = await User.findOne({ email }); // find one user associated with provided email
         if (!user) {
-          return done(null, false, { message: 'User not found' }); // if user doesn't match any users in db return error
+          return done(null, false, {
+            message: 'User with given email does not exist.',
+          }); // if user doesn't match any users in db return error
         }
 
         const validate = await user.isValidPassword(password);
         if (!validate) {
-          return done(null, false, { message: 'Wrong password' }); // if pw doesn't match pw associated with user in db return error
+          return done(null, false, { message: 'Incorrect password.' }); // if pw doesn't match pw associated with user in db return error
         }
 
-        return done(null, user, { message: 'Logged in Successfully' }); // if user and pw match, return success message, and user info is sent to next middleware.
+        return done(null, user, { message: 'Logged in successfully.' }); // if user and pw match, return success message, and user info is sent to next middleware.
       } catch (err) {
         return done(err); // otherwise report error
       }
