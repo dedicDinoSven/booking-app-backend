@@ -28,6 +28,12 @@ const LocationSchema = new Schema({
   },
 });
 
+LocationSchema.method("toJSON", function() {
+  const { __v, _id, ...object } = this.toObject();
+  object.id = _id;
+  return object;
+});
+
 const Location = mongoose.model('Location', LocationSchema);
 
 module.exports = { Location, LocationSchema };

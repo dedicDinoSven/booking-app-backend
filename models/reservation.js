@@ -25,12 +25,23 @@ const ReservationSchema = new Schema({
     ref: 'Property',
     required: true,
   },
-  reservationCreated: {
+  dateCreated: {
     type: Date,
     default: Date.now,
   },
+  is_active: {
+    type: Boolean,
+    default: true,
+    required: true,
+  },
+});
+
+ReservationSchema.method("toJSON", function() {
+  const { __v, _id, ...object } = this.toObject();
+  object.id = _id;
+  return object;
 });
 
 const Reservation = mongoose.model('Reservation', ReservationSchema);
 
-module.exports = { Reservation, ReservationSchema };
+module.exports = Reservation;

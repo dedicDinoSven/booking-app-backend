@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const locationSchema = require('./location');
+const LocationSchema = require('./location').LocationSchema;
 
 const PropertySchema = new Schema({
   name: {
@@ -11,7 +11,6 @@ const PropertySchema = new Schema({
   propertyType: {
     type: Schema.Types.ObjectId,
     ref: 'PropertyType',
-    required: true,
   },
   bedrooms: {
     type: Number,
@@ -33,13 +32,13 @@ const PropertySchema = new Schema({
     type: Number,
     required: true,
   },
-  location: locationSchema,
+  location: LocationSchema,
   description: {
     type: String,
     required: true,
     maxLength: 500,
   },
-  freeCancellation: {
+  freeCancel: {
     type: Boolean,
     required: true,
   },
@@ -49,7 +48,7 @@ const PropertySchema = new Schema({
       ref: 'Amenity',
     },
   ],
-  imageUrlList: [
+  imageUrls: [
     {
       type: String,
       required: true,
@@ -60,6 +59,21 @@ const PropertySchema = new Schema({
     ref: 'User',
     required: true,
   },
+  dateCreated: {
+    type: Date,
+    default: Date.now,
+  },
+  is_active: {
+    type: Boolean,
+    default: true,
+    required: true
+  }
+});
+
+PropertySchema.method("toJSON", function() {
+  const { __v, _id, ...object } = this.toObject();
+  object.id = _id;
+  return object;
 });
 
 const Property = mongoose.model('Property', PropertySchema);

@@ -3,7 +3,10 @@ const Schema = mongoose.Schema;
 const bcrypt = require('bcrypt');
 
 const UserSchema = new Schema({
-  fullName: { type: String, required: true, },
+  fullName: { 
+    type: String, 
+    required: true, 
+  },
   email: {
     type: String,
     required: true,
@@ -17,6 +20,11 @@ const UserSchema = new Schema({
     type: Date,
     default: Date.now,
   },
+  is_active: {
+    type: Boolean,
+    default: true,
+    required: true
+  }
 });
 
 // code in the UserSchema.pre() is called pre-hook. Before user info is saved in db, this function will be called

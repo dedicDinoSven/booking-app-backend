@@ -1,5 +1,5 @@
 const seeder = require('mongoose-seed');
-const mongo = '';
+const mongo = 'mongodb+srv://nodidbr:8MfdeDfmm5gGYMP9@clustercluster.zpmh2.mongodb.net/myFirstDatabase?retryWrites=true&w=majority';
 
 seeder.connect(mongo, function () {
   seeder.loadModels(['./models/amenity', './models/propertyType']);

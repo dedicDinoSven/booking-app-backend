@@ -10,7 +10,7 @@ const router = express.Router();
 
 // handle post request for registration, when user sends post request to this route, passport authenticates user based on middleware in config/auth.js
 router.post('/register', registrationValidator, async (req, res, next) => {
-  passport.authenticate('register', async (err, user, info) => {
+  passport.authenticate('register', { session: false }, async (err, user, info) => {
     try {
       let errors = validationResult(req);
       if (!errors.isEmpty()) {
@@ -30,7 +30,7 @@ router.post('/register', registrationValidator, async (req, res, next) => {
 
 // handle post request for login
 router.post('/login', loginValidator, async (req, res, next) => {
-  passport.authenticate('login',{session: false}, async (err, user, info) => {
+  passport.authenticate('login', { session: false }, async (err, user, info) => {
     try {
       let errors = validationResult(req);
       if (!errors.isEmpty()) {
@@ -49,7 +49,7 @@ router.post('/login', loginValidator, async (req, res, next) => {
         if (error) return next(error);
 
         const body = {
-          _id: user._id,
+          id: user._id,
           fullName: user.fullName,
           email: user.email,
           dateJoined: user.dateJoined,

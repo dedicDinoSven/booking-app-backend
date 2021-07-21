@@ -3,7 +3,7 @@ require('dotenv').config();
 
 const createError = require('http-errors');
 const express = require('express');
-const cookieParser = require('cookie-parser')
+const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const passport = require('passport');
 
@@ -23,13 +23,13 @@ app.use('/', require('./routes/index'));
 app.use('/users', require('./routes/users'));
 // Plug in the JWT strategy as a middleware so only verified users can access this route.
 app.use(
-  '/secure',
+  '/property',
   passport.authenticate('jwt', { session: false }),
-  require('./routes/secureRoutes')
+  require('./routes/properties')
 );
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   next(createError(404));
 });
 
