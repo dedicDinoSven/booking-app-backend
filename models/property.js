@@ -3,77 +3,77 @@ const Schema = mongoose.Schema;
 const LocationSchema = require('./location').LocationSchema;
 
 const PropertySchema = new Schema({
-  name: {
-    type: String,
-    required: true,
-    maxLength: 50,
-  },
-  propertyType: {
-    type: Schema.Types.ObjectId,
-    ref: 'PropertyType',
-  },
-  bedrooms: {
-    type: Number,
-    required: true,
-  },
-  beds: {
-    type: Number,
-    required: true,
-  },
-  bathrooms: {
-    type: Number,
-    required: true,
-  },
-  pricePerNight: {
-    type: Number,
-    required: true,
-  },
-  maxGuests: {
-    type: Number,
-    required: true,
-  },
-  location: LocationSchema,
-  description: {
-    type: String,
-    required: true,
-    maxLength: 500,
-  },
-  freeCancel: {
-    type: Boolean,
-    required: true,
-  },
-  amenities: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: 'Amenity',
-    },
-  ],
-  imageUrls: [
-    {
-      type: String,
-      required: true,
-    },
-  ],
-  host: {
-    type: Schema.Types.ObjectId,
-    ref: 'User',
-    required: true,
-  },
-  dateCreated: {
-    type: Date,
-    default: Date.now,
-  },
-  is_active: {
-    type: Boolean,
-    default: true,
-    required: true
-  }
+	name: {
+		type: String,
+		required: true,
+		maxLength: 50,
+	},
+	propertyType: {
+		type: Schema.Types.ObjectId,
+		ref: 'PropertyType',
+	},
+	bedrooms: {
+		type: Number,
+		required: true,
+	},
+	beds: {
+		type: Number,
+		required: true,
+	},
+	bathrooms: {
+		type: Number,
+		required: true,
+	},
+	pricePerNight: {
+		type: Number,
+		required: true,
+	},
+	maxGuests: {
+		type: Number,
+		required: true,
+	},
+	location: LocationSchema,
+	description: {
+		type: String,
+		required: true,
+		maxLength: 500,
+	},
+	freeCancel: {
+		type: Boolean,
+		required: true,
+	},
+	amenities: [
+		{
+			type: Schema.Types.ObjectId,
+			ref: 'Amenity',
+		},
+	],
+	imageUrls: [
+		{
+			type: String,
+			required: true,
+		},
+	],
+	host: {
+		type: Schema.Types.ObjectId,
+		ref: 'User',
+		required: true,
+	},
+	dateCreated: {
+		type: Date,
+		default: Date.now,
+	},
+	is_active: {
+		type: Boolean,
+		default: true,
+		required: true,
+	},
 });
 
-PropertySchema.method("toJSON", function() {
-  const { __v, _id, ...object } = this.toObject();
-  object.id = _id;
-  return object;
+PropertySchema.method('toJSON', function () {
+	const { __v, _id, ...object } = this.toObject();
+	object.id = _id;
+	return object;
 });
 
 const Property = mongoose.model('Property', PropertySchema);
