@@ -28,6 +28,14 @@ const LocationSchema = new Schema({
 	},
 });
 
+LocationSchema.pre('save', function (next) {
+	this.address = this.address.charAt(0).toUpperCase() + this.address.slice(1);
+	this.city = this.city.charAt(0).toUpperCase() + this.city.slice(1);
+	this.country = this.country.charAt(0).toUpperCase() + this.country.slice(1);
+
+	next();
+});
+
 LocationSchema.method('toJSON', function () {
 	const { __v, _id, ...object } = this.toObject();
 	object.id = _id;

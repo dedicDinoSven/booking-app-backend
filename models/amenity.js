@@ -15,6 +15,11 @@ const AmenitySchema = new Schema({
 	],
 });
 
+AmenitySchema.pre('save', function (next) {
+	this.name.charAt(0).toUpperCase() + this.name.slice(1).toLowerCase();
+	next();
+});
+
 AmenitySchema.method('toJSON', function () {
 	const { __v, _id, ...object } = this.toObject();
 	object.id = _id;

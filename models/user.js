@@ -29,7 +29,6 @@ const UserSchema = new Schema({
 
 // code in the UserSchema.pre() is called pre-hook. Before user info is saved in db, this function will be called
 UserSchema.pre('save', async function (next) {
-	const user = this; // current doc about to be saved
 	const hash = await bcrypt.hash(this.password, 10); // pw and salt round (higher salt round runs hashing for more iterations and is more secure)
 
 	this.password = hash; // replace plain text pw with hash and then store it

@@ -9,9 +9,9 @@ exports.getCreateProperty = async (req, res) => {
 		const amenities = await Amenity.find().lean().exec();
 		const types = await PropertyType.find({}, 'name description').lean().exec();
 
-		res.status(201).json({ amenities: amenities, types: types });
+		res.status(200).json({ amenities: amenities, types: types });
 	} catch (err) {
-		res.status(409).json({ message: err.message });
+		res.status(404).json({ message: err.message });
 	}
 };
 
@@ -42,7 +42,6 @@ exports.createProperty = async (req, res) => {
 	let amenities = req.body.amenities;
 
 	try {
-		
 		const propertyType = await PropertyType.findOne({
 			name: req.body.propertyType,
 		})
@@ -81,29 +80,120 @@ exports.createProperty = async (req, res) => {
 
 exports.getAllProperties = async (req, res) => {
 	try {
-		const properties = await Property.find().lean().exec();
+		const properties = await Property.find()
+			.populate('propertyType', '-__v -_id')
+			.populate('host', '-__v -_id -password -is_active -dateJoined')
+			.populate('amenities', '-__v -_id -properties')
+			.lean()
+			.exec();
 
-		res.status(201).json(properties);
+		res.status(200).json(properties);
 	} catch (err) {
-		res.status(409).json({ message: err.message })
+		res.status(404).json({ message: err.message });
 	}
 };
 
 exports.getAllPropertiesWithinCity = async (req, res) => {
-	const city = req.params.city;
+	let city = req.params.city;
+	city = city.charAt(0).toUpperCase() + city.slice(1);
 
 	try {
-		const properties = await Property.find({ 'location.city': city }).lean().exec();
+		const properties = await Property.find({ 'location.city': city })
+			.populate('propertyType', '-__v -_id')
+			.populate('host', '-__v -_id -password -is_active -dateJoined')
+			.populate('amenities', '-__v -_id -properties')
+			.lean()
+			.exec();
 
 		res.status(201).json(properties);
 	} catch (err) {
-		res.status(409).json({ message: err.message});
+		res.status(409).json({ message: err.message });
 	}
-}
+};
 
-exports.getPropertiesWithinType = (typeId) => {
-	return Property.find({ propertyType: typeId }, 'name').populate(
-		'propertyType',
-		'-_id -__v -description'
-	);
+exports.getAllPropertiesWithinCountry = async (req, res) => {
+	let country = req.params.country;
+	country = country.charAt(0).toUpperCase() + country.slice(1);
+
+	try {
+		const properties = await Property.find({ 'location.country': country })
+			.populate('propertyType', '-__v -_id')
+			.populate('host', '-__v -_id -password -is_active -dateJoined')
+			.populate('amenities', '-__v -_id -properties')
+			.lean()
+			.exec();
+
+		res.status(200).json(properties);
+	} catch (err) {
+		res.status(404).json({ message: err.message });
+	}
+};
+
+exports.getAllPropertiesWithinType = async (req, res) => {
+	let type = req.params.type;
+	type = type.charAt(0).toUpperCase() + type.slice(1);
+
+	try {
+		const propertyType = await PropertyType.findOne({ name: type })
+			.lean()
+			.exec();
+
+		const properties = await Property.find({ propertyType: propertyType._id })
+			.populate('propertyType', '-__v -_id')
+			.populate('host', '-__v -_id -password -is_active -dateJoined')
+			.populate('amenities', '-__v -_id -properties')
+			.lean()
+			.exec();
+
+		res.status(200).json(properties);
+	} catch (err) {
+		res.status(404).json({ message: err.message });
+	}
+};
+
+exports.getSingleProperty = async (req, res) => {
+	const id = req.params.id;
+
+	try {
+		const property = await Property.findById(id)
+			.populate('propertyType', '-__v -_id')
+			.populate('host', '-__v -_id -password -is_active -dateJoined')
+			.populate('amenities', '-__v -_id -properties')
+			.lean()
+			.exec();
+
+		res.status(200).json(property);
+	} catch (err) {
+		res.status(404).json({ message: err.message });
+	}
+};
+
+exports.updateProperty = async (req, res) => {
+
+};
+
+exports.deleteProperty = async (req, res) => {
+	const id = req.params.id;
+
+	try {
+		const property = await Property.findById(id).lean().exec();
+
+		let location = property.location;
+		location = await Location.findByIdAndDelete(location._id).lean().exec();
+
+		let amenities = property.amenities;
+		for (let i = 0; i < amenities.length; ++i) {
+			amenities[i] = await Amenity.findByIdAndUpdate(
+				amenities[i]._id,
+				{ $pull: { properties: id } },
+				{ new: true }
+			);
+		}
+
+		const x = await Property.deleteOne({ _id: id });
+		
+		res.json({ message: 'Property deleted successfully.' });
+	} catch (err) {
+		res.status(409).json({ message: err.message });
+	}
 };

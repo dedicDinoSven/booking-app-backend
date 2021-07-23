@@ -1,20 +1,21 @@
 const express = require('express');
 const router = express.Router();
 
-const PropertyType = require('../models/propertyType');
+const property = require('../controllers/property');
 
-const amenityController = require('../controllers/amenity');
-const locationController = require('../controllers/location');
-const propertyController = require('../controllers/property');
-const propertyTypeController = require('../controllers/propertyType');
-const reservationController = require('../controllers/reservation');
+router.get('/create-new', property.getCreateProperty);
 
-router.get('/create-new', propertyController.getCreateProperty);
+router.post('/create-new', property.createProperty);
 
-router.post('/create-new', propertyController.createProperty);
+router.get('/all', property.getAllProperties);
 
-router.get('/all', propertyController.getAllProperties);
+router.get('/all/city/:city', property.getAllPropertiesWithinCity);
 
-router.get('/:city', propertyController.getAllPropertiesWithinCity);
+router.get('/all/country/:country', property.getAllPropertiesWithinCountry);
 
+router.get('/all/type/:type', property.getAllPropertiesWithinType);
+
+router.get('/:id', property.getSingleProperty);
+
+router.delete('/:id', property.deleteProperty);
 module.exports = router;

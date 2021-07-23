@@ -70,6 +70,12 @@ const PropertySchema = new Schema({
 	},
 });
 
+PropertySchema.pre('save', function (next) {
+	this.name = this.name.charAt(0).toUpperCase() + this.name.slice(1);
+	
+	next();
+});
+
 PropertySchema.method('toJSON', function () {
 	const { __v, _id, ...object } = this.toObject();
 	object.id = _id;
