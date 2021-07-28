@@ -3,6 +3,7 @@
 // arrA = ['a', 'b', 'c', 'd'];     arrB = ['c', 'd', 'e', 'f'];
 // difference(arrA, arrB) returns: ['a', 'b'] present in arrA but not in arrB
 // difference(arrB, arrA) returns: ['e', 'f'] present in arrB but not in arrA
+
 exports.difference = (A, B) => {
     const arrA = Array.isArray(A) ? A.map(x => x.toString()) : [A.toString()];
     const arrB = Array.isArray(B) ? B.map(x => x.toString()) : [B.toString()];

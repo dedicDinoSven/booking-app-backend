@@ -17,5 +17,8 @@ router.get('/all/type/:type', property.getAllPropertiesWithinType);
 
 router.get('/:id', property.getSingleProperty);
 
+router.put('/:id', property.updateProperty);
+
 router.delete('/:id', property.deleteProperty);
+
 module.exports = router;

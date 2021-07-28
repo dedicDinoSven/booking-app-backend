@@ -63,11 +63,6 @@ const PropertySchema = new Schema({
 		type: Date,
 		default: Date.now,
 	},
-	is_active: {
-		type: Boolean,
-		default: true,
-		required: true,
-	},
 });
 
 PropertySchema.pre('save', function (next) {

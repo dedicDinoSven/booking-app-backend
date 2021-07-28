@@ -1,15 +1,10 @@
-const express = require('express');
 const passport = require('passport');
 const jwt = require('jsonwebtoken');
 const { validationResult } = require('express-validator');
-const {
-	registrationValidator,
-	loginValidator,
-} = require('../middleware/formValidators');
-const router = express.Router();
 
-// handle post request for registration, when user sends post request to this route, passport authenticates user based on middleware in config/auth.js
-router.post('/register', registrationValidator, async (req, res, next) => {
+// handle post request for registration, when user sends post request to this route,
+// passport authenticates user based on middleware in config/auth.js
+exports.register = async (req, res, next) => {
 	passport.authenticate(
 		'register',
 		{ session: false },
@@ -30,10 +25,9 @@ router.post('/register', registrationValidator, async (req, res, next) => {
 			}
 		}
 	)(req, res, next);
-});
+};
 
-// handle post request for login
-router.post('/login', loginValidator, async (req, res, next) => {
+exports.login = async (req, res, next) => {
 	passport.authenticate(
 		'login',
 		{ session: false },
@@ -70,11 +64,4 @@ router.post('/login', loginValidator, async (req, res, next) => {
 			}
 		}
 	)(req, res, next);
-});
-
-router.get('/logout', (req, res) => {
-	req.logout();
-	res.json({ message: 'Logged out successfully.' });
-});
-
-module.exports = router;
+};

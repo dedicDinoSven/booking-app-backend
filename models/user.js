@@ -20,11 +20,6 @@ const UserSchema = new Schema({
 		type: Date,
 		default: Date.now,
 	},
-	is_active: {
-		type: Boolean,
-		default: true,
-		required: true,
-	},
 });
 
 // code in the UserSchema.pre() is called pre-hook. Before user info is saved in db, this function will be called
