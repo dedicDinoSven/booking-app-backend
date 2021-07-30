@@ -2,6 +2,10 @@ const passport = require('passport');
 const jwt = require('jsonwebtoken');
 const { validationResult } = require('express-validator');
 
+const User = require('../models/user');
+const Property = require('../models/property');
+const Reservation = require('../models/reservation');
+
 // handle post request for registration, when user sends post request to this route,
 // passport authenticates user based on middleware in config/auth.js
 exports.register = async (req, res, next) => {
@@ -64,4 +68,65 @@ exports.login = async (req, res, next) => {
 			}
 		}
 	)(req, res, next);
+};
+
+exports.getUserProfile = async (req, res) => {
+	try {
+		const id = req.params.id;
+
+		const user = await User.findOne({ _id: id }, '-__v').lean().exec();
+
+		const properties = await Property.find({ host: id }, '-host -__v')
+			.populate('propertyType', '-__v -_id')
+			.populate('amenities', '-__v -_id -properties')
+			.lean()
+			.exec();
+
+		const reservations = await Reservation.find({ guest: id }, '-__v -guest')
+			.populate({
+				path: 'property',
+				populate: { path: 'amenities propertyType', select: '-__v -_id -properties' }
+			})
+			.lean()
+			.exec();
+
+		res
+			.status(200)
+			.json({ user: user, properties: properties, reservations: reservations });
+	} catch (err) {
+		res.status(404).json({ message: err.message });
+	}
+};
+
+exports.updateUserProfile = async (req, res) => {
+	try {
+		await User.findById(req.params.id, (err, user) => {
+			if (err) {
+				res.status(409).json({ message: err.message });
+			}
+			
+			user.set(req.body);
+
+			user.save((saveErr, updatedUser) => {
+				if (saveErr) {
+					res.status(409).json({ message: saveErr.message });
+				}
+				res.status(200).json(updatedUser);
+			});
+		});
+	} catch (err) {
+		res.status(409).json({ message: err.message });
+	}
+};
+
+exports.deleteUserProfile = async (req, res) => {
+	try {
+		const id = req.params.id;
+
+		await User.deleteOne({ _id: id }).lean().exec();
+
+		res.json({ message: 'User deleted successfully.' });
+	} catch (err) {
+		res.status(409).json({ message: err.message });
+	}
 };

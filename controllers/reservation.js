@@ -33,7 +33,9 @@ exports.updateReservation = async (req, res) => {
 				numberOfGuests: req.body.numberOfGuests,
 			},
 			{ new: true }
-		).lean().exec();
+		)
+			.lean()
+			.exec();
 
 		res.status(200).json(reservation);
 	} catch (err) {
@@ -42,9 +44,9 @@ exports.updateReservation = async (req, res) => {
 };
 
 exports.deleteReservation = async (req, res) => {
-    try {
+	try {
 		const id = req.params.id;
-		
+
 		await Reservation.deleteOne({ _id: id }).lean().exec();
 
 		res.json({ message: 'Reservation deleted successfully.' });
