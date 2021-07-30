@@ -7,6 +7,8 @@ router.get('/create-new', property.getCreateProperty);
 
 router.post('/create-new', property.createProperty);
 
+router.get('/', property.searchForProperties);
+
 router.get('/all', property.getAllProperties);
 
 router.get('/all/city/:city', property.getAllPropertiesWithinCity);

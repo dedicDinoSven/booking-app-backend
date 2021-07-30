@@ -85,7 +85,10 @@ exports.getUserProfile = async (req, res) => {
 		const reservations = await Reservation.find({ guest: id }, '-__v -guest')
 			.populate({
 				path: 'property',
-				populate: { path: 'amenities propertyType', select: '-__v -_id -properties' }
+				populate: {
+					path: 'amenities propertyType',
+					select: '-__v -_id -properties',
+				},
 			})
 			.lean()
 			.exec();
@@ -100,20 +103,15 @@ exports.getUserProfile = async (req, res) => {
 
 exports.updateUserProfile = async (req, res) => {
 	try {
-		await User.findById(req.params.id, (err, user) => {
-			if (err) {
-				res.status(409).json({ message: err.message });
-			}
-			
-			user.set(req.body);
+		const user = await User.findByIdAndUpdate(
+			{ _id: req.params.id },
+			req.body,
+			{ new: true }
+		)
+			.lean()
+			.exec();
 
-			user.save((saveErr, updatedUser) => {
-				if (saveErr) {
-					res.status(409).json({ message: saveErr.message });
-				}
-				res.status(200).json(updatedUser);
-			});
-		});
+		res.status(200).json(user);
 	} catch (err) {
 		res.status(409).json({ message: err.message });
 	}
@@ -121,11 +119,13 @@ exports.updateUserProfile = async (req, res) => {
 
 exports.deleteUserProfile = async (req, res) => {
 	try {
-		const id = req.params.id;
+		await User.deleteOne({ _id: req.params.id }).lean().exec();
 
-		await User.deleteOne({ _id: id }).lean().exec();
+		await Property.deleteMany({ host: req.params.id }).lean().exec();
 
-		res.json({ message: 'User deleted successfully.' });
+		await Reservation.deleteMany({ guest: req.params. id }).lean().exec();
+
+		res.status(200).json({ message: 'User deleted successfully.' });
 	} catch (err) {
 		res.status(409).json({ message: err.message });
 	}

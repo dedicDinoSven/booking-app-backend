@@ -20,13 +20,27 @@ exports.createReservation = async (req, res) => {
 	}
 };
 
+exports.getSingleReservation = async (req, res) => {
+	try {
+		const reservation = await Reservation.findById(req.params.id).populate({
+			path: 'property guest',
+			populate: {
+				path: 'amenities propertyType',
+				select: '-__v -_id -properties',
+			}
+		}).lean().exec();
+
+		res.status(200).json(reservation);
+	} catch (err) {
+		res.status(404).json({ message: err.message});
+	}
+}
 exports.updateReservation = async (req, res) => {
 	try {
-		const id = req.params.id;
 		const today = new Date().toLocaleDateString();
 
 		const reservation = await Reservation.findByIdAndUpdate(
-			id,
+			req.params.id,
 			{
 				dateStart: req.body.dateStart || today,
 				dateEnd: req.body.dateEnd || today,
@@ -45,9 +59,7 @@ exports.updateReservation = async (req, res) => {
 
 exports.deleteReservation = async (req, res) => {
 	try {
-		const id = req.params.id;
-
-		await Reservation.deleteOne({ _id: id }).lean().exec();
+		await Reservation.deleteOne({ _id: req.params.id }).lean().exec();
 
 		res.json({ message: 'Reservation deleted successfully.' });
 	} catch (err) {
