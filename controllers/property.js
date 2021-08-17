@@ -34,6 +34,11 @@ exports.createProperty = async (req, res) => {
 		});
 		await location.save();
 
+		const images = req.files;
+		const imageUrls = images.map(image => {
+			return image.path;
+		});
+
 		let property = new Property({
 			name: req.body.name,
 			propertyType: propertyType._id,
@@ -45,8 +50,8 @@ exports.createProperty = async (req, res) => {
 			location: location,
 			description: req.body.description,
 			freeCancel: req.body.freeCancel,
-			imageUrls: req.files.path,
 			host: req.user.id,
+			imageUrls: imageUrls
 		});
 		await property.save();
 
@@ -65,13 +70,13 @@ exports.createProperty = async (req, res) => {
 			.exec();
 		property = await Property.findByIdAndUpdate(
 			property._id,
-			{ $push: { amenities: amenitiesIds } },
+			{ $push: { amenities: amenitiesIds,  } },
 			{ new: true }
 		)
 			.lean()
 			.exec();
 
-		res.status(201).json(property);
+			res.status(201).json(property);
 	} catch (err) {
 		res.status(409).json({ message: err.message });
 	}
