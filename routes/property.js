@@ -2,10 +2,11 @@ const express = require('express');
 const router = express.Router();
 
 const property = require('../controllers/property');
+const parser = require('../middleware/cloudinary');
 
 router.get('/create-new', property.getCreateProperty);
 
-router.post('/create-new', property.createProperty);
+router.post('/create-new', parser.array('imageUrls'), property.createProperty);
 
 router.get('/', property.searchForProperties);
 

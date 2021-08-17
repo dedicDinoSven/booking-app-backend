@@ -45,7 +45,7 @@ exports.createProperty = async (req, res) => {
 			location: location,
 			description: req.body.description,
 			freeCancel: req.body.freeCancel,
-			imageUrls: req.body.imageUrls,
+			imageUrls: req.files.path,
 			host: req.user.id,
 		});
 		await property.save();
