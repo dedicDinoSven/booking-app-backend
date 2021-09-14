@@ -48,7 +48,8 @@ exports.createReservationById = async (req, res) => {
 		)
 			.lean()
 			.exec();
-
+		console.log(today);
+		console.log(typeof today)
 		res.status(201).json({ reservation, property });
 	} catch (err) {
 		res.status(409).json({ message: err.message });
@@ -96,7 +97,13 @@ exports.updateReservation = async (req, res) => {
 
 exports.deleteReservation = async (req, res) => {
 	try {
-		await Reservation.deleteOne({ _id: req.params.id }).lean().exec();
+		const id = req.params.id;
+
+		const reservation = await Reservation.findById(id).lean().exec();
+
+		const property = await Property.findByIdAndUpdate(reservation.property, { $pull: { reservations: id}}).lean().exec();
+
+		await Reservation.deleteOne({ _id: id }).lean().exec();
 
 		res.json({ message: 'Reservation deleted successfully.' });
 	} catch (err) {

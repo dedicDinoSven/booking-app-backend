@@ -18,7 +18,7 @@ router.post(
 	property.createProperty
 );
 
-router.get('/', property.searchForProperties);
+router.get('/search', property.searchForProperties);
 
 router.get('/all', property.getAllProperties);
 

@@ -2,6 +2,7 @@ const Property = require('../models/property');
 const Location = require('../models/location').Location;
 const PropertyType = require('../models/propertyType');
 const Amenity = require('../models/amenity');
+const Reservation = require('../models/reservation');
 
 const difference = require('../helpers').difference;
 
@@ -19,7 +20,7 @@ exports.getCreateProperty = async (req, res) => {
 exports.createProperty = async (req, res) => {
 	try {
 		const propertyType = await PropertyType.findOne({
-			name: req.body.propertyType,
+			name: req.body.propertyType
 		})
 			.lean()
 			.exec();
@@ -30,12 +31,12 @@ exports.createProperty = async (req, res) => {
 			zipCode: req.body.zipCode,
 			country: req.body.country,
 			lat: req.body.lat,
-			lng: req.body.lng,
+			lng: req.body.lng
 		});
 		await location.save();
 
 		const images = req.files;
-		const imageUrls = images.map(image => {
+		const imageUrls = images.map((image) => {
 			return image.path;
 		});
 
@@ -70,21 +71,43 @@ exports.createProperty = async (req, res) => {
 			.exec();
 		property = await Property.findByIdAndUpdate(
 			property._id,
-			{ $push: { amenities: amenitiesIds,  } },
+			{ $push: { amenities: amenitiesIds } },
 			{ new: true }
 		)
 			.lean()
 			.exec();
 
-			res.status(201).json(property);
+		res.status(201).json(property);
 	} catch (err) {
 		res.status(409).json({ message: err.message });
 	}
 };
 
 exports.searchForProperties = async (req, res) => {
-	
-}
+	try {
+		const cityRegex = new RegExp(req.query.city, 'i');
+
+		const properties = await Property.find({
+			$and: [
+				{ 'location.city': { $regex: cityRegex } },
+				{ maxGuests: { $gte: req.query.numberOfGuests } }
+			]
+		})
+			.populate('propertyType', '-__v -_id')
+			.populate('host', '-__v -_id -password -is_active -dateJoined')
+			.populate('amenities', '-__v -_id -properties')
+			.populate('reservations', '-__v -property')
+			.lean()
+			.exec();
+
+		const reservedDates = properties.map(property => { return property.reservation})
+		console.log(reservedDates);
+
+		res.status(201).json(properties);
+	} catch (err) {
+		res.status(404).json({ message: err.message });
+	}
+};
 
 exports.getAllProperties = async (req, res) => {
 	try {
@@ -174,12 +197,13 @@ exports.getSingleProperty = async (req, res, next) => {
 			.lean()
 			.exec();
 
-		res.app.set('propertyId', id)
+		res.app.set('propertyId', id);
 
 		res.status(200).json(property);
 	} catch (err) {
 		res.status(404).json({ message: err.message });
-	};(req, res, next);
+	}
+	req, res, next;
 };
 
 exports.updateProperty = async (req, res) => {
@@ -189,7 +213,7 @@ exports.updateProperty = async (req, res) => {
 		let property = await Property.findById(id).lean().exec();
 
 		const propertyType = await PropertyType.findOne({
-			name: req.body.propertyType,
+			name: req.body.propertyType
 		})
 			.lean()
 			.exec();
@@ -203,7 +227,7 @@ exports.updateProperty = async (req, res) => {
 				zipCode: req.body.zipCode,
 				country: req.body.country,
 				lat: req.body.lat,
-				lng: req.body.lng,
+				lng: req.body.lng
 			},
 			{ new: true }
 		)
@@ -221,14 +245,11 @@ exports.updateProperty = async (req, res) => {
 		const added = difference(newAmenitiesIds, oldAmenitiesIds);
 		const removed = difference(oldAmenitiesIds, newAmenitiesIds);
 
-		await Amenity.updateMany(
-			{ '_id': added },
-			{ $addToSet: { properties: id } }
-		)
+		await Amenity.updateMany({ _id: added }, { $addToSet: { properties: id } })
 			.lean()
 			.exec();
 
-		await Amenity.updateMany({ '_id': removed }, { $pull: { properties: id } })
+		await Amenity.updateMany({ _id: removed }, { $pull: { properties: id } })
 			.lean()
 			.exec();
 
@@ -247,7 +268,7 @@ exports.updateProperty = async (req, res) => {
 				description: req.body.description,
 				freeCancel: req.body.freeCancel,
 				imageUrls: req.body.imageUrls,
-				host: req.user.id,
+				host: req.user.id
 			},
 			{ new: true }
 		)
@@ -263,7 +284,7 @@ exports.updateProperty = async (req, res) => {
 exports.deleteProperty = async (req, res) => {
 	try {
 		const id = req.params.id;
-		
+
 		const property = await Property.findById(id).lean().exec();
 
 		let location = property.location;

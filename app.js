@@ -6,7 +6,7 @@ const express = require('express');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const passport = require('passport');
-
+const cors = require('cors');
 const db = require('./mongodb');
 
 require('./middleware/auth');
@@ -17,7 +17,7 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-
+app.use(cors());
 // Routes
 app.use('/', require('./routes/index'));
 app.use('/user', require('./routes/user'));
