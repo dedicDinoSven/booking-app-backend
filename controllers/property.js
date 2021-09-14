@@ -100,9 +100,6 @@ exports.searchForProperties = async (req, res) => {
 			.lean()
 			.exec();
 
-		const reservedDates = properties.map(property => { return property.reservation})
-		console.log(reservedDates);
-
 		res.status(201).json(properties);
 	} catch (err) {
 		res.status(404).json({ message: err.message });
