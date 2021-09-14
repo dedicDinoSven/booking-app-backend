@@ -1,4 +1,5 @@
 const Reservation = require('../models/reservation');
+const Property = require('../models/property');
 
 exports.createReservation = async (req, res) => {
 	const propertyId = res.app.get('propertyId');
@@ -9,32 +10,68 @@ exports.createReservation = async (req, res) => {
 			dateEnd: req.body.dateEnd || today,
 			guest: req.user.id,
 			numberOfGuests: req.body.numberOfGuests,
-			property: propertyId,
+			property: propertyId
 		});
-
 		await reservation.save();
 
-		res.status(201).json(reservation);
+		const property = await Property.findByIdAndUpdate(
+			propertyId,
+			{ $push: { reservations: reservation._id } },
+			{ new: true }
+		)
+			.lean()
+			.exec();
+
+		res.status(201).json({ reservation, property });
 	} catch (err) {
 		res.status(409).json({ message: err.message });
 	}
 };
 
+exports.createReservationById = async (req, res) => {
+	try {
+		const today = new Date().toLocaleDateString();
+		const reservation = new Reservation({
+			dateStart: req.body.dateStart || today,
+			dateEnd: req.body.dateEnd || today,
+			guest: req.user.id,
+			numberOfGuests: req.body.numberOfGuests,
+			property: req.params.id
+		});
+
+		await reservation.save();
+
+		const property = await Property.findByIdAndUpdate(
+			req.params.id,
+			{ $push: { reservations: reservation._id } },
+			{ new: true }
+		)
+			.lean()
+			.exec();
+
+		res.status(201).json({ reservation, property });
+	} catch (err) {
+		res.status(409).json({ message: err.message });
+	}
+};
 exports.getSingleReservation = async (req, res) => {
 	try {
-		const reservation = await Reservation.findById(req.params.id).populate({
-			path: 'property guest',
-			populate: {
-				path: 'amenities propertyType',
-				select: '-__v -_id -properties',
-			}
-		}).lean().exec();
+		const reservation = await Reservation.findById(req.params.id)
+			.populate({
+				path: 'property guest',
+				populate: {
+					path: 'amenities propertyType',
+					select: '-__v -_id -properties'
+				}
+			})
+			.lean()
+			.exec();
 
 		res.status(200).json(reservation);
 	} catch (err) {
-		res.status(404).json({ message: err.message});
+		res.status(404).json({ message: err.message });
 	}
-}
+};
 exports.updateReservation = async (req, res) => {
 	try {
 		const today = new Date().toLocaleDateString();
@@ -44,7 +81,7 @@ exports.updateReservation = async (req, res) => {
 			{
 				dateStart: req.body.dateStart || today,
 				dateEnd: req.body.dateEnd || today,
-				numberOfGuests: req.body.numberOfGuests,
+				numberOfGuests: req.body.numberOfGuests
 			},
 			{ new: true }
 		)

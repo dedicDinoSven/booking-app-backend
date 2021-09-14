@@ -3,11 +3,11 @@ const Schema = mongoose.Schema;
 
 const ReservationSchema = new Schema({
 	dateStart: {
-		type: String,
+		type: Date,
 		required: true,
 	},
 	dateEnd: {
-		type: String,
+		type: Date,
 		required: true,
 	},
 	guest: {

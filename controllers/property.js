@@ -92,6 +92,7 @@ exports.getAllProperties = async (req, res) => {
 			.populate('propertyType', '-__v -_id')
 			.populate('host', '-__v -_id -password -is_active -dateJoined')
 			.populate('amenities', '-__v -_id -properties')
+			.populate('reservations', '-__v -property')
 			.lean()
 			.exec();
 
@@ -110,6 +111,7 @@ exports.getAllPropertiesWithinCity = async (req, res) => {
 			.populate('propertyType', '-__v -_id')
 			.populate('host', '-__v -_id -password -is_active -dateJoined')
 			.populate('amenities', '-__v -_id -properties')
+			.populate('reservations', '-__v -property')
 			.lean()
 			.exec();
 
@@ -128,6 +130,7 @@ exports.getAllPropertiesWithinCountry = async (req, res) => {
 			.populate('propertyType', '-__v -_id')
 			.populate('host', '-__v -_id -password -is_active -dateJoined')
 			.populate('amenities', '-__v -_id -properties')
+			.populate('reservations', '-__v -property')
 			.lean()
 			.exec();
 
@@ -150,6 +153,7 @@ exports.getAllPropertiesWithinType = async (req, res) => {
 			.populate('propertyType', '-__v -_id')
 			.populate('host', '-__v -_id -password -is_active -dateJoined')
 			.populate('amenities', '-__v -_id -properties')
+			.populate('reservations', '-__v -property')
 			.lean()
 			.exec();
 
@@ -166,6 +170,7 @@ exports.getSingleProperty = async (req, res, next) => {
 			.populate('propertyType', '-__v -_id')
 			.populate('host', '-__v -_id -password -is_active -dateJoined')
 			.populate('amenities', '-__v -_id -properties')
+			.populate('reservations', '-__v -property')
 			.lean()
 			.exec();
 

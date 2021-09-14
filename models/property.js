@@ -59,6 +59,12 @@ const PropertySchema = new Schema({
 		ref: 'User',
 		required: true,
 	},
+	reservations: [
+		{
+			type: Schema.Types.ObjectId,
+			ref: 'Reservation'
+		}
+	],
 	dateCreated: {
 		type: Date,
 		default: Date.now,

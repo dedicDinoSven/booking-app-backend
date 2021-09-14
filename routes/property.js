@@ -1,12 +1,22 @@
 const express = require('express');
 const router = express.Router();
 
+const passport = require('passport');
 const property = require('../controllers/property');
 const parser = require('../middleware/cloudinary');
 
-router.get('/create-new', property.getCreateProperty);
+router.get(
+	'/create-new',
+	passport.authenticate('jwt', { session: false }),
+	property.getCreateProperty
+);
 
-router.post('/create-new', parser.array('imageUrls'), property.createProperty);
+router.post(
+	'/create-new',
+	passport.authenticate('jwt', { session: false }),
+	parser.array('imageUrls'),
+	property.createProperty
+);
 
 router.get('/', property.searchForProperties);
 
@@ -20,8 +30,16 @@ router.get('/all/type/:type', property.getAllPropertiesWithinType);
 
 router.get('/:id', property.getSingleProperty);
 
-router.put('/:id', property.updateProperty);
+router.put(
+	'/:id',
+	passport.authenticate('jwt', { session: false }),
+	property.updateProperty
+);
 
-router.delete('/:id', property.deleteProperty);
+router.delete(
+	'/:id',
+	passport.authenticate('jwt', { session: false }),
+	property.deleteProperty
+);
 
 module.exports = router;

@@ -79,6 +79,7 @@ exports.getUserProfile = async (req, res) => {
 		const properties = await Property.find({ host: id }, '-host -__v')
 			.populate('propertyType', '-__v -_id')
 			.populate('amenities', '-__v -_id -properties')
+			.populate('reservations', '-__v')
 			.lean()
 			.exec();
 
