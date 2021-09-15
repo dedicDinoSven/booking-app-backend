@@ -14,7 +14,6 @@ router.get(
 router.post(
 	'/create-new',
 	passport.authenticate('jwt', { session: false }),
-	parser.array('imageUrls'),
 	property.createProperty
 );
 

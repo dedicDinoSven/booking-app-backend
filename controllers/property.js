@@ -35,11 +35,6 @@ exports.createProperty = async (req, res) => {
 		});
 		await location.save();
 
-		const images = req.files;
-		const imageUrls = images.map((image) => {
-			return image.path;
-		});
-
 		let property = new Property({
 			name: req.body.name,
 			propertyType: propertyType._id,
@@ -52,7 +47,7 @@ exports.createProperty = async (req, res) => {
 			description: req.body.description,
 			freeCancel: req.body.freeCancel,
 			host: req.user.id,
-			imageUrls: imageUrls
+			imageUrls: req.body.imageUrls
 		});
 		await property.save();
 
