@@ -8,7 +8,7 @@ const difference = require('../helpers').difference;
 
 exports.getCreateProperty = async (req, res) => {
 	try {
-		const amenities = await Amenity.find().lean().exec();
+		const amenities = await Amenity.find({}, '-properties -__v').lean().exec();
 		const types = await PropertyType.find({}, 'name description').lean().exec();
 
 		res.status(200).json({ amenities: amenities, types: types });

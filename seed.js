@@ -1,6 +1,6 @@
 const seeder = require('mongoose-seed');
 const mongo = '';
-
+// mongodb+srv://root:root@cluster0.w9kzx.mongodb.net/myFirstDatabase?retryWrites=true&w=majority
 seeder.connect(mongo, function () {
 	seeder.loadModels(['./models/amenity', './models/propertyType']);
 

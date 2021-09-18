@@ -18,8 +18,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(cors());
+
 // Routes
-app.use('/', require('./routes/index'));
 app.use('/user', require('./routes/user'));
 // Plug in the JWT strategy as a middleware so only verified users can access this route.
 app.use('/property', require('./routes/property'));

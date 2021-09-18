@@ -3,7 +3,6 @@ const router = express.Router();
 
 const passport = require('passport');
 const property = require('../controllers/property');
-const parser = require('../middleware/cloudinary');
 
 router.get(
 	'/create-new',
